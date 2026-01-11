@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { QuizAnswer, QuizResult } from '@/lib/types';
+import { QuizAnswer, QuizResult, RIASEC_LABELS, RIASEC_DESCRIPTIONS, RIASECCategory } from '@/lib/types';
 import { getQuizResult, getHollandCodeInterpretation } from '@/lib/scoring';
 import ResultChart from '@/components/ResultChart';
 import MajorCard from '@/components/MajorCard';
@@ -12,12 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   ArrowLeft,
-  Share2,
+  Download,
   RefreshCw,
   CheckCircle,
   Info,
   Loader2,
 } from 'lucide-react';
+import jsPDF from 'jspdf';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -60,28 +61,183 @@ export default function ResultsPage() {
     router.push('/quiz');
   };
 
-  // Handle share (copy to clipboard)
-  const handleShare = async () => {
+  // Handle download PDF
+  const handleDownloadPDF = () => {
     if (!result) return;
 
-    const shareText = `🎓 Hasil ITB Major Predictor
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 20;
+    let yPos = margin;
 
-📊 Holland Code: ${result.hollandCode.join('')}
+    // Helper function to add new page if needed
+    const checkNewPage = (height: number) => {
+      if (yPos + height > pageHeight - margin) {
+        doc.addPage();
+        yPos = margin;
+        return true;
+      }
+      return false;
+    };
 
-🏆 Top 5 Jurusan yang Cocok:
-${result.recommendations
-  .slice(0, 5)
-  .map((r, i) => `${i + 1}. ${r.major.name} (${r.matchPercentage}% match)`)
-  .join('\n')}
+    // Header
+    doc.setFillColor(15, 23, 42); // Dark blue background
+    doc.rect(0, 0, pageWidth, 50, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ITB Major Predictor', pageWidth / 2, 25, { align: 'center' });
+    
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Hasil Analisis RIASEC', pageWidth / 2, 35, { align: 'center' });
+    
+    yPos = 65;
 
-Coba juga di: [URL]`;
+    // Holland Code Section
+    doc.setTextColor(15, 23, 42);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Holland Code Kamu', margin, yPos);
+    yPos += 12;
 
-    try {
-      await navigator.clipboard.writeText(shareText);
-      alert('Hasil berhasil disalin ke clipboard!');
-    } catch {
-      alert('Gagal menyalin hasil');
-    }
+    // Holland Code badges
+    const hollandCode = result.hollandCode;
+    const codeColors: Record<RIASECCategory, [number, number, number]> = {
+      R: [255, 107, 107],
+      I: [77, 171, 247],
+      A: [177, 151, 252],
+      S: [81, 207, 102],
+      E: [255, 169, 77],
+      C: [116, 143, 252],
+    };
+
+    let xPos = margin;
+    hollandCode.forEach((code) => {
+      const color = codeColors[code];
+      doc.setFillColor(color[0], color[1], color[2]);
+      doc.roundedRect(xPos, yPos, 25, 25, 3, 3, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text(code, xPos + 12.5, yPos + 16, { align: 'center' });
+      xPos += 30;
+    });
+    yPos += 35;
+
+    // Interpretation
+    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const interpretation = getHollandCodeInterpretation(result.hollandCode);
+    const splitInterpretation = doc.splitTextToSize(interpretation, pageWidth - 2 * margin);
+    doc.text(splitInterpretation, margin, yPos);
+    yPos += splitInterpretation.length * 5 + 15;
+
+    // RIASEC Scores Section
+    doc.setTextColor(15, 23, 42);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Skor RIASEC', margin, yPos);
+    yPos += 12;
+
+    const categories: RIASECCategory[] = ['R', 'I', 'A', 'S', 'E', 'C'];
+    const maxScore = Math.max(...Object.values(result.scores));
+
+    categories.forEach((cat) => {
+      const score = result.scores[cat];
+      const percentage = maxScore > 0 ? (score / maxScore) * 100 : 0;
+      const color = codeColors[cat];
+
+      // Category label
+      doc.setTextColor(15, 23, 42);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${cat} - ${RIASEC_LABELS[cat]}`, margin, yPos);
+      
+      // Score value
+      doc.setTextColor(100, 116, 139);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${score}`, pageWidth - margin, yPos, { align: 'right' });
+      yPos += 5;
+
+      // Progress bar background
+      doc.setFillColor(226, 232, 240);
+      doc.roundedRect(margin, yPos, pageWidth - 2 * margin, 6, 2, 2, 'F');
+
+      // Progress bar fill
+      const barWidth = ((pageWidth - 2 * margin) * percentage) / 100;
+      if (barWidth > 0) {
+        doc.setFillColor(color[0], color[1], color[2]);
+        doc.roundedRect(margin, yPos, Math.max(barWidth, 4), 6, 2, 2, 'F');
+      }
+      yPos += 12;
+    });
+
+    yPos += 10;
+
+    // Top 10 Recommendations Section
+    checkNewPage(20);
+    doc.setTextColor(15, 23, 42);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Top 10 Rekomendasi Jurusan', margin, yPos);
+    yPos += 15;
+
+    result.recommendations.slice(0, 10).forEach((rec, index) => {
+      checkNewPage(35);
+
+      // Rank badge
+      const rankColor = index < 3 ? [16, 185, 129] : [100, 116, 139]; // Green for top 3
+      doc.setFillColor(rankColor[0], rankColor[1], rankColor[2]);
+      doc.circle(margin + 8, yPos + 8, 8, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${index + 1}`, margin + 8, yPos + 11, { align: 'center' });
+
+      // Major name
+      doc.setTextColor(15, 23, 42);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(rec.major.name, margin + 22, yPos + 6);
+
+      // Faculty and match percentage
+      doc.setTextColor(100, 116, 139);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${rec.major.faculty}`, margin + 22, yPos + 14);
+      
+      // Match percentage badge
+      doc.setFillColor(16, 185, 129, 0.2);
+      const matchText = `${rec.matchPercentage}% Match`;
+      const matchWidth = doc.getTextWidth(matchText) + 8;
+      doc.setFillColor(220, 252, 231);
+      doc.roundedRect(pageWidth - margin - matchWidth, yPos + 2, matchWidth, 12, 2, 2, 'F');
+      doc.setTextColor(22, 163, 74);
+      doc.setFontSize(9);
+      doc.text(matchText, pageWidth - margin - matchWidth + 4, yPos + 10);
+
+      yPos += 25;
+    });
+
+    // Footer
+    checkNewPage(30);
+    yPos = pageHeight - 25;
+    doc.setDrawColor(226, 232, 240);
+    doc.line(margin, yPos - 10, pageWidth - margin, yPos - 10);
+    
+    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Hasil ini berdasarkan Holland RIASEC Theory dan bukan keputusan akhir.', pageWidth / 2, yPos, { align: 'center' });
+    doc.text(`Dibuat pada: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`, pageWidth / 2, yPos + 5, { align: 'center' });
+    doc.text('© ITB Major Predictor - Keluarga Mahasiswa Jambi ITB', pageWidth / 2, yPos + 10, { align: 'center' });
+
+    // Save PDF
+    doc.save(`Hasil-RIASEC-${result.hollandCode.join('')}-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   if (isLoading) {
@@ -121,9 +277,9 @@ Coba juga di: [URL]`;
             </Link>
           </Button>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={handleShare} className="gap-2 text-muted-foreground hover:text-foreground">
-              <Share2 className="w-4 h-4" />
-              Bagikan
+            <Button variant="ghost" onClick={handleDownloadPDF} className="gap-2 text-muted-foreground hover:text-foreground">
+              <Download className="w-4 h-4" />
+              Download Hasil
             </Button>
             <Button onClick={handleRetake} className="gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90">
               <RefreshCw className="w-4 h-4" />
