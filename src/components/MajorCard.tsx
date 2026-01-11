@@ -80,9 +80,9 @@ export default function MajorCard({ recommendation, rank, index = 0 }: MajorCard
             </motion.div>
           </motion.div>
         )}
-        <CardContent className={FACULTY_LOGOS[major.facultyCode] ? "p-4" : "p-5"}>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
+        <CardContent className={FACULTY_LOGOS[major.facultyCode] ? "p-3 sm:p-4" : "p-3 sm:p-5"}>
+          <div className="flex items-start justify-between gap-2 sm:gap-4">
+            <div className="flex-1 min-w-0 overflow-hidden">
               {/* Rank Badge - only show if no faculty logo */}
               {!FACULTY_LOGOS[major.facultyCode] && (
                 <motion.div
@@ -97,22 +97,22 @@ export default function MajorCard({ recommendation, rank, index = 0 }: MajorCard
 
               {/* Major Info */}
               <motion.div 
-                className="flex items-center gap-2 mb-1 flex-wrap"
+                className="flex items-center gap-2 mb-1 flex-wrap overflow-hidden"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: index * 0.1 + 0.2 }}
               >
-                <Badge variant="secondary" className="font-mono bg-muted/50 border-border/50">
+                <Badge variant="secondary" className="font-mono bg-muted/50 border-border/50 shrink-0">
                   {major.code}
                 </Badge>
-                <span className="text-sm font-medium text-primary truncate">
+                <span className="text-xs sm:text-sm font-medium text-primary truncate max-w-[150px] sm:max-w-none">
                   {major.faculty}
                 </span>
               </motion.div>
-              <h3 className="font-semibold text-foreground text-lg leading-tight">
+              <h3 className="font-semibold text-foreground text-sm sm:text-base md:text-lg leading-tight line-clamp-2">
                 {major.name}
               </h3>
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">
                 {major.description}
               </p>
 
@@ -158,7 +158,7 @@ export default function MajorCard({ recommendation, rank, index = 0 }: MajorCard
               transition={{ delay: index * 0.1 + 0.3, type: "spring" }}
             >
               <motion.div
-                className={`text-2xl font-bold ${
+                className={`text-xl sm:text-2xl font-bold ${
                   matchPercentage >= 80
                     ? 'text-emerald-400'
                     : matchPercentage >= 60

@@ -288,29 +288,31 @@ export default function ResultsPage() {
 
   return (
     <motion.div 
-      className="min-h-screen bg-background"
+      className="min-h-screen bg-background overflow-x-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
       {/* Gradient overlays */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
-      <motion.div 
-        className="fixed top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"
-        animate={{ 
-          scale: [1, 1.1, 1],
-          opacity: [0.3, 0.5, 0.3]
-        }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div 
-        className="fixed bottom-0 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none"
-        animate={{ 
-          scale: [1, 1.1, 1],
-          opacity: [0.3, 0.5, 0.3]
-        }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      />
+      <div className="fixed inset-0 pointer-events-none">
+        <motion.div 
+          className="absolute -top-48 -right-48 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute -bottom-48 -left-48 w-96 h-96 bg-accent/10 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+      </div>
 
       {/* Header */}
       <motion.header 
@@ -319,36 +321,36 @@ export default function ResultsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <motion.div whileHover={{ x: -3 }}>
-            <Button variant="ghost" asChild className="text-muted-foreground hover:text-foreground">
-              <Link href="/" className="flex items-center gap-2">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-2">
+          <motion.div whileHover={{ x: -3 }} className="shrink-0">
+            <Button variant="ghost" asChild className="text-muted-foreground hover:text-foreground px-2 sm:px-4">
+              <Link href="/" className="flex items-center gap-1 sm:gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                Beranda
+                <span className="hidden sm:inline">Beranda</span>
               </Link>
             </Button>
           </motion.div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 sm:gap-3">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button variant="ghost" onClick={handleDownloadPDF} className="gap-2 text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" onClick={handleDownloadPDF} className="gap-1 sm:gap-2 text-muted-foreground hover:text-foreground px-2 sm:px-4">
                 <Download className="w-4 h-4" />
-                Download Hasil
+                <span className="hidden sm:inline">Download Hasil</span>
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button onClick={handleRetake} className="gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90">
+              <Button onClick={handleRetake} className="gap-1 sm:gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90 px-2 sm:px-4">
                 <RefreshCw className="w-4 h-4" />
-                Ulangi Test
+                <span className="hidden xs:inline">Ulangi Test</span>
               </Button>
             </motion.div>
           </div>
         </div>
       </motion.header>
 
-      <main className="relative max-w-6xl mx-auto px-4 py-8">
+      <main className="relative w-full max-w-6xl mx-auto px-2 sm:px-4 py-6 sm:py-8">
         {/* Result Header */}
         <motion.div 
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -360,13 +362,13 @@ export default function ResultsPage() {
             </Badge>
           </motion.div>
           <motion.h1 
-            className="text-3xl md:text-4xl font-bold text-foreground mb-4"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4 px-2"
             variants={itemVariants}
           >
             Hasil Analisis RIASEC Kamu
           </motion.h1>
           <motion.p 
-            className="text-lg text-muted-foreground max-w-2xl mx-auto"
+            className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2"
             variants={itemVariants}
           >
             {getHollandCodeInterpretation(result.hollandCode)}
@@ -374,7 +376,7 @@ export default function ResultsPage() {
         </motion.div>
 
         {/* Two Column Layout */}
-        <div className="grid lg:grid-cols-5 gap-8">
+        <div className="grid lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
           {/* Left Column - RIASEC Chart */}
           <motion.div 
             className="lg:col-span-2"

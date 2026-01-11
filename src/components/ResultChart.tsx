@@ -20,34 +20,34 @@ export default function ResultChart({ scores, hollandCode }: ResultChartProps) {
   const categories: RIASECCategory[] = ['R', 'I', 'A', 'S', 'E', 'C'];
 
   return (
-    <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl shadow-black/20">
-      <CardHeader>
-        <CardTitle className="text-foreground">Profil RIASEC Kamu</CardTitle>
+    <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl shadow-black/20 w-full">
+      <CardHeader className="px-3 sm:px-6">
+        <CardTitle className="text-foreground text-base sm:text-lg">Profil RIASEC Kamu</CardTitle>
         <CardDescription>
           Holland Code:{' '}
           <span className="font-bold text-primary">{hollandCode.join('')}</span>
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">
         {/* Bar Chart */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {categories.map((cat) => (
-            <div key={cat} className="space-y-2">
-              <div className="flex items-center gap-3">
+            <div key={cat} className="space-y-1.5 sm:space-y-2">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <div
                   style={{ backgroundColor: RIASEC_COLORS[cat] }}
-                  className="text-white font-bold w-8 h-8 rounded-lg flex items-center justify-center text-sm shadow-lg"
+                  className="text-white font-bold w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm shadow-lg shrink-0"
                 >
                   {cat}
                 </div>
-                <span className="text-sm font-medium flex-1 text-foreground">
+                <span className="text-xs sm:text-sm font-medium flex-1 text-foreground truncate">
                   {RIASEC_LABELS[cat]}
                 </span>
-                <span className="text-sm text-muted-foreground w-12 text-right font-mono">
+                <span className="text-xs sm:text-sm text-muted-foreground w-10 sm:w-12 text-right font-mono shrink-0">
                   {percentages[cat]}%
                 </span>
               </div>
-              <div className="relative h-3 bg-muted/30 rounded-full overflow-hidden">
+              <div className="relative h-2.5 sm:h-3 bg-muted/30 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500 ease-out"
                   style={{ 
@@ -62,16 +62,16 @@ export default function ResultChart({ scores, hollandCode }: ResultChartProps) {
         </div>
 
         {/* Legend */}
-        <div className="pt-4 border-t border-border/50">
-          <h4 className="text-sm font-semibold text-muted-foreground mb-3">
+        <div className="pt-3 sm:pt-4 border-t border-border/50">
+          <h4 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3">
             Top 3 Karakteristik Kamu:
           </h4>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {hollandCode.map((cat, index) => (
               <Badge
                 key={cat}
                 style={{ backgroundColor: RIASEC_COLORS[cat] }}
-                className="text-white shadow-lg"
+                className="text-white shadow-lg text-xs"
               >
                 #{index + 1} {RIASEC_LABELS[cat]}
               </Badge>
