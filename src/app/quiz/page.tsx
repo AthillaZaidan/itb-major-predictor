@@ -7,6 +7,7 @@ import { questions, TOTAL_QUESTIONS } from '@/lib/questions';
 import { QuizAnswer } from '@/lib/types';
 import ProgressBar from '@/components/ProgressBar';
 import QuestionCard from '@/components/QuestionCard';
+import AnalyzingScreen from '@/components/AnalyzingScreen';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 
@@ -15,6 +16,7 @@ export default function QuizPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAnalyzing, setShowAnalyzing] = useState(false);
 
   const currentQuestion = questions[currentIndex];
 
@@ -73,7 +75,12 @@ export default function QuizPage() {
     // Store answers in localStorage
     localStorage.setItem('quizAnswers', JSON.stringify(answers));
 
-    // Navigate to results
+    // Show analyzing screen
+    setShowAnalyzing(true);
+  };
+
+  // Handle analysis complete - navigate to results
+  const handleAnalysisComplete = () => {
     router.push('/results');
   };
 
@@ -81,6 +88,11 @@ export default function QuizPage() {
   const isComplete = answers.length === TOTAL_QUESTIONS;
   const isLastQuestion = currentIndex === TOTAL_QUESTIONS - 1;
   const isCurrentAnswered = getCurrentAnswer() !== null;
+
+  // Show analyzing screen when submitting
+  if (showAnalyzing) {
+    return <AnalyzingScreen onComplete={handleAnalysisComplete} />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
