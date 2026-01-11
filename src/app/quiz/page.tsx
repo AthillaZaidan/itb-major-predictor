@@ -48,6 +48,13 @@ export default function QuizPage() {
 
   // Navigate to next question
   const handleNext = () => {
+    // Check if current question is answered
+    const currentAnswer = getCurrentAnswer();
+    if (currentAnswer === null) {
+      alert('Silakan jawab pertanyaan ini terlebih dahulu!');
+      return;
+    }
+    
     if (currentIndex < TOTAL_QUESTIONS - 1) {
       setCurrentIndex((prev) => prev + 1);
     }
@@ -73,6 +80,7 @@ export default function QuizPage() {
   // Check if all questions are answered
   const isComplete = answers.length === TOTAL_QUESTIONS;
   const isLastQuestion = currentIndex === TOTAL_QUESTIONS - 1;
+  const isCurrentAnswered = getCurrentAnswer() !== null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -135,7 +143,8 @@ export default function QuizPage() {
             <Button
               variant="ghost"
               onClick={handleNext}
-              className="gap-2 text-primary hover:text-primary hover:bg-primary/10"
+              disabled={!isCurrentAnswered}
+              className="gap-2 text-primary hover:text-primary hover:bg-primary/10 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Selanjutnya
               <ArrowRight className="w-4 h-4" />

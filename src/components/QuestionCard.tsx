@@ -46,7 +46,7 @@ export default function QuestionCard({
                 className="group relative z-10 focus:outline-none"
               >
                 <div
-                  className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                  className={`w-8 h-8 md:w-7 md:h-7 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
                     currentAnswer === value
                       ? 'bg-primary border-primary scale-125 shadow-lg shadow-primary/30'
                       : 'bg-background border-muted-foreground/50 hover:border-primary/70 hover:scale-110'
@@ -63,10 +63,10 @@ export default function QuestionCard({
 
         {/* Scale Labels */}
         <div className="flex justify-between mt-6 text-sm">
-          <span className="text-muted-foreground max-w-[120px] md:max-w-[160px]">
+          <span className="text-muted-foreground">
             Sangat Tidak Setuju
           </span>
-          <span className="text-muted-foreground max-w-[120px] md:max-w-[160px] text-right">
+          <span className="text-muted-foreground text-right">
             Sangat Setuju
           </span>
         </div>
