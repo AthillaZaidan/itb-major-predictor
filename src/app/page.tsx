@@ -125,29 +125,6 @@ export default function Home() {
                 </Link>
               </Button>
             </motion.div>
-
-            {/* Stats */}
-            <motion.div 
-              className="flex flex-wrap justify-center gap-4 md:gap-8 mt-8 md:mt-12 text-center px-4"
-              variants={containerVariants}
-            >
-              {[
-                { value: '30', label: 'Pertanyaan' },
-                { value: '50', label: 'Jurusan ITB' },
-                { value: '~5', label: 'Menit' },
-              ].map((stat, i) => (
-                <motion.div 
-                  key={stat.label}
-                  className="bg-card/50 backdrop-blur-sm rounded-2xl px-5 md:px-6 py-3 md:py-4 border border-border/50 min-w-[100px]"
-                  variants={itemVariants}
-                  whileHover={{ y: -4, scale: 1.02 }}
-                  custom={i}
-                >
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
-                  <div className="text-xs md:text-sm text-muted-foreground">{stat.label}</div>
-                </motion.div>
-              ))}
-            </motion.div>
           </div>
         </motion.div>
       </section>
