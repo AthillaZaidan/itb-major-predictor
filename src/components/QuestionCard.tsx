@@ -3,6 +3,7 @@
 import { Question } from '@/lib/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
 
 interface QuestionCardProps {
   question: Question;
@@ -24,12 +25,23 @@ export default function QuestionCard({
   return (
     <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl shadow-black/20">
       <CardHeader className="pb-6">
-        <Badge variant="secondary" className="w-fit mb-6 text-xs font-medium">
-          Question {questionNumber} of {totalQuestions}
-        </Badge>
-        <h2 className="text-xl font-semibold text-foreground leading-relaxed">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Badge variant="secondary" className="w-fit mb-6 text-xs font-medium">
+            Question {questionNumber} of {totalQuestions}
+          </Badge>
+        </motion.div>
+        <motion.h2 
+          className="text-xl font-semibold text-foreground leading-relaxed"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
           {question.text}
-        </h2>
+        </motion.h2>
       </CardHeader>
       <CardContent className="pt-4 pb-8">
         {/* Scale Slider UI */}
@@ -39,37 +51,61 @@ export default function QuestionCard({
           
           {/* Scale Points */}
           <div className="relative flex justify-between items-center">
-            {SCALE_OPTIONS.map((value) => (
-              <button
+            {SCALE_OPTIONS.map((value, index) => (
+              <motion.button
                 key={value}
                 onClick={() => onAnswer(value)}
                 className="group relative z-10 focus:outline-none"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ 
+                  duration: 0.3, 
+                  delay: 0.2 + index * 0.05,
+                  type: "spring",
+                  stiffness: 200
+                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <div
-                  className={`w-8 h-8 md:w-7 md:h-7 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                <motion.div
+                  className={`w-8 h-8 md:w-7 md:h-7 rounded-full border-2 transition-colors duration-300 flex items-center justify-center ${
                     currentAnswer === value
-                      ? 'bg-primary border-primary scale-125 shadow-lg shadow-primary/30'
-                      : 'bg-background border-muted-foreground/50 hover:border-primary/70 hover:scale-110'
+                      ? 'bg-primary border-primary shadow-lg shadow-primary/30'
+                      : 'bg-background border-muted-foreground/50 hover:border-primary/70'
                   }`}
+                  animate={{
+                    scale: currentAnswer === value ? 1.25 : 1,
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   {currentAnswer === value && (
-                    <div className="w-2 h-2 rounded-full bg-primary-foreground" />
+                    <motion.div 
+                      className="w-2 h-2 rounded-full bg-primary-foreground"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    />
                   )}
-                </div>
-              </button>
+                </motion.div>
+              </motion.button>
             ))}
           </div>
         </div>
 
         {/* Scale Labels */}
-        <div className="flex justify-between mt-6 text-sm">
+        <motion.div 
+          className="flex justify-between mt-6 text-sm"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+        >
           <span className="text-muted-foreground">
             Sangat Tidak Setuju
           </span>
           <span className="text-muted-foreground text-right">
             Sangat Setuju
           </span>
-        </div>
+        </motion.div>
       </CardContent>
     </Card>
   );

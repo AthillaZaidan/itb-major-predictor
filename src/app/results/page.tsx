@@ -19,6 +19,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -244,10 +245,15 @@ export default function ResultsPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="fixed inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
-        <div className="text-center relative">
+        <motion.div 
+          className="text-center relative"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
           <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">Menghitung hasil...</p>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -260,64 +266,137 @@ export default function ResultsPage() {
     ? result.recommendations
     : result.recommendations.slice(0, 5);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div 
+      className="min-h-screen bg-background"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       {/* Gradient overlays */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
-      <div className="fixed top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="fixed bottom-0 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
+      <motion.div 
+        className="fixed top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"
+        animate={{ 
+          scale: [1, 1.1, 1],
+          opacity: [0.3, 0.5, 0.3]
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div 
+        className="fixed bottom-0 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none"
+        animate={{ 
+          scale: [1, 1.1, 1],
+          opacity: [0.3, 0.5, 0.3]
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      />
 
       {/* Header */}
-      <header className="relative bg-card/50 backdrop-blur-xl border-b border-border/50">
+      <motion.header 
+        className="relative bg-card/50 backdrop-blur-xl border-b border-border/50"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Button variant="ghost" asChild className="text-muted-foreground hover:text-foreground">
-            <Link href="/" className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Beranda
-            </Link>
-          </Button>
+          <motion.div whileHover={{ x: -3 }}>
+            <Button variant="ghost" asChild className="text-muted-foreground hover:text-foreground">
+              <Link href="/" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Beranda
+              </Link>
+            </Button>
+          </motion.div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={handleDownloadPDF} className="gap-2 text-muted-foreground hover:text-foreground">
-              <Download className="w-4 h-4" />
-              Download Hasil
-            </Button>
-            <Button onClick={handleRetake} className="gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90">
-              <RefreshCw className="w-4 h-4" />
-              Ulangi Test
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button variant="ghost" onClick={handleDownloadPDF} className="gap-2 text-muted-foreground hover:text-foreground">
+                <Download className="w-4 h-4" />
+                Download Hasil
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button onClick={handleRetake} className="gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <RefreshCw className="w-4 h-4" />
+                Ulangi Test
+              </Button>
+            </motion.div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       <main className="relative max-w-6xl mx-auto px-4 py-8">
         {/* Result Header */}
-        <div className="text-center mb-12">
-          <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/30 gap-2 mb-4">
-            <CheckCircle className="w-4 h-4" />
-            Test Selesai!
-          </Badge>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+        <motion.div 
+          className="text-center mb-12"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          <motion.div variants={itemVariants}>
+            <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/30 gap-2 mb-4">
+              <CheckCircle className="w-4 h-4" />
+              Test Selesai!
+            </Badge>
+          </motion.div>
+          <motion.h1 
+            className="text-3xl md:text-4xl font-bold text-foreground mb-4"
+            variants={itemVariants}
+          >
             Hasil Analisis RIASEC Kamu
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          </motion.h1>
+          <motion.p 
+            className="text-lg text-muted-foreground max-w-2xl mx-auto"
+            variants={itemVariants}
+          >
             {getHollandCodeInterpretation(result.hollandCode)}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Two Column Layout */}
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Left Column - RIASEC Chart */}
-          <div className="lg:col-span-2">
+          <motion.div 
+            className="lg:col-span-2"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
             <div className="sticky top-24">
               <ResultChart
                 scores={result.scores}
                 hollandCode={result.hollandCode}
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column - Major Recommendations */}
-          <div className="lg:col-span-3">
+          <motion.div 
+            className="lg:col-span-3"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-foreground">
                 Rekomendasi Jurusan
@@ -328,66 +407,100 @@ export default function ResultsPage() {
             </div>
 
             <div className="space-y-4">
-              {displayedMajors.map((recommendation, index) => (
-                <MajorCard
-                  key={recommendation.major.code}
-                  recommendation={recommendation}
-                  rank={index + 1}
-                />
-              ))}
+              <AnimatePresence mode="popLayout">
+                {displayedMajors.map((recommendation, index) => (
+                  <MajorCard
+                    key={recommendation.major.code}
+                    recommendation={recommendation}
+                    rank={index + 1}
+                    index={index}
+                  />
+                ))}
+              </AnimatePresence>
             </div>
 
             {/* Show More Button */}
-            {!showAllMajors && result.recommendations.length > 5 && (
-              <Button
-                variant="ghost"
-                onClick={() => setShowAllMajors(true)}
-                className="w-full mt-6 text-primary hover:text-primary hover:bg-primary/10"
-              >
-                Lihat {result.recommendations.length - 5} jurusan lainnya
-              </Button>
-            )}
+            <AnimatePresence mode="wait">
+              {!showAllMajors && result.recommendations.length > 5 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowAllMajors(true)}
+                    className="w-full mt-6 text-primary hover:text-primary hover:bg-primary/10"
+                  >
+                    Lihat {result.recommendations.length - 5} jurusan lainnya
+                  </Button>
+                </motion.div>
+              )}
 
-            {showAllMajors && (
-              <Button
-                variant="ghost"
-                onClick={() => setShowAllMajors(false)}
-                className="w-full mt-6 text-muted-foreground"
-              >
-                Tampilkan lebih sedikit
-              </Button>
-            )}
-          </div>
+              {showAllMajors && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowAllMajors(false)}
+                    className="w-full mt-6 text-muted-foreground"
+                  >
+                    Tampilkan lebih sedikit
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
 
         {/* Disclaimer */}
-        <Card className="mt-16 bg-amber-500/10 border-amber-500/30">
-          <CardContent className="p-6">
-            <div className="flex gap-4">
-              <div className="shrink-0">
-                <Info className="w-6 h-6 text-amber-400" />
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <Card className="mt-16 bg-amber-500/10 border-amber-500/30">
+            <CardContent className="p-6">
+              <div className="flex gap-4">
+                <motion.div 
+                  className="shrink-0"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                >
+                  <Info className="w-6 h-6 text-amber-400" />
+                </motion.div>
+                <div>
+                  <h3 className="font-semibold text-amber-300 mb-1">Catatan</h3>
+                  <p className="text-sm text-amber-200/80">
+                    Hasil ini adalah rekomendasi berdasarkan Holland RIASEC Theory
+                    dan bukan keputusan akhir. Gunakan sebagai referensi dan
+                    pertimbangkan juga faktor lain seperti passion, prospek karir,
+                    dan kemampuan akademik. Konsultasikan dengan guru BK atau
+                    konselor karir untuk keputusan yang lebih matang.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-amber-300 mb-1">Catatan</h3>
-                <p className="text-sm text-amber-200/80">
-                  Hasil ini adalah rekomendasi berdasarkan Holland RIASEC Theory
-                  dan bukan keputusan akhir. Gunakan sebagai referensi dan
-                  pertimbangkan juga faktor lain seperti passion, prospek karir,
-                  dan kemampuan akademik. Konsultasikan dengan guru BK atau
-                  konselor karir untuk keputusan yang lebih matang.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
       </main>
 
       {/* Footer */}
-      <footer className="relative py-8 border-t border-border/50 mt-16">
+      <motion.footer 
+        className="relative py-8 border-t border-border/50 mt-16"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+      >
         <div className="max-w-6xl mx-auto px-4 text-center text-muted-foreground text-sm">
           <p>© 2026 ITB Major Predictor. Berdasarkan Holland RIASEC Theory.</p>
         </div>
-      </footer>
-    </div>
+      </motion.footer>
+    </motion.div>
   );
 }
